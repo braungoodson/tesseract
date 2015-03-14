@@ -1,0 +1,59 @@
+﻿@model tesseract.Ceres
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Index</h2>
+
+<fieldset>
+    <legend>Ceres</legend>
+
+    <div class="display-label">
+         @Html.DisplayNameFor(model => model.Phase)
+    </div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.Phase)
+    </div>
+
+    <div class="display-label">
+         @Html.DisplayNameFor(model => model.LastUpdatedBy)
+    </div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.LastUpdatedBy)
+    </div>
+</fieldset>
+<p>
+    @Html.ActionLink("Edit", "Edit", new { /* id=Model.PrimaryKey */ }) |
+    @Html.ActionLink("Back to List", "Index")
+</p>
+
+<script type="text/javascript">
+    $(function () {
+        // Declare a proxy to reference the hub.
+        var ceres = $.connection.ceresHub;
+        // Create a function that the hub can call to broadcast messages.
+        ceres.client.broadcastMessage = function (name, message) {
+            // Html encode display name and message.
+            var encodedName = $('<div />').text(name).html();
+            var encodedMsg = $('<div />').text(message).html();
+            // Add the message to the page.
+            $('#discussion').append('<li><strong>' + encodedName
+                + '</strong>:&nbsp;&nbsp;' + encodedMsg + '</li>');
+        };
+        // Get the user name and store it to prepend to messages.
+        $('#displayname').val(prompt('Enter your name:', ''));
+        // Set initial focus to message input box.
+        $('#message').focus();
+        // Start the connection.
+        $.connection.hub.start().done(function () {
+            $('#sendmessage').click(function () {
+                // Call the Send method on the hub.
+                chat.server.send($('#displayname').val(), $('#message').val());
+                // Clear text box and reset focus for next comment.
+                $('#message').val('').focus();
+            });
+        });
+    });
+</script>
